@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiosk Rotation</title>
+<style>
+  :root { --bg: #0b1220; }
+  html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
+  iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--bg);
+           transition: opacity .6s; }
+  .hidden { opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+<iframe id="train" src="http://localhost:8502" title="Train times"></iframe>
+<iframe id="travel" class="hidden" src="http://localhost:8503/?view=kiosk" title="Travel deals"></iframe>
+<script>
+  const q = new URLSearchParams(location.search);
+  const trainMs = Math.max(15, Number(q.get("train")) || 120) * 1000;
+  const travelMs = Math.max(15, Number(q.get("travel")) || 45) * 1000;
+  const train = document.getElementById("train");
+  const travel = document.getElementById("travel");
+  let showingTrain = true;
+  function flip() {
+    showingTrain = !showingTrain;
+    train.classList.toggle("hidden", !showingTrain);
+    travel.classList.toggle("hidden", showingTrain);
+    if (showingTrain) {
+      // reload the hidden deals screen so it is fresh (and recovers if it was still starting up)
+      setTimeout(() => { travel.src = "http://localhost:8503/?view=kiosk"; }, 1000);
+    }
+    setTimeout(flip, showingTrain ? trainMs : travelMs);
+  }
+  setTimeout(flip, trainMs);
+</script>
+</body>
+</html>

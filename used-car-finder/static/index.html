@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Used Car Deal Finder</title>
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand"><img src="icon.png" alt=""><div><b>Used Car Deal Finder</b><small>Pick the type, years and mileage; see which cars are priced below similar ones</small></div></div>
+  <div class="spacer"></div>
+  <div class="usage" id="usage"></div>
+  <button class="ghost" id="open-settings">&#9881; Settings</button>
+</header>
+<div class="layout">
+  <aside id="filters"></aside>
+  <main>
+    <section id="setup" class="hidden"></section>
+    <section id="results"><div class="empty-state">Choose what you're looking for on the left, then press <b>Find cars</b>.</div></section>
+  </main>
+</div>
+<div id="modal" class="hidden"><div class="shade"></div><div class="dlg"></div></div>
+<div id="toast" class="hidden"></div>
+<script src="app.js"></script>
+</body>
+</html>
