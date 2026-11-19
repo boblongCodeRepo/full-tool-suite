@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Network Map</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--text:#1b1f24;--muted:#5d6670;--line:#e3e6ea;--accent:#2563eb;--ok:#16a34a;--off:#b4bcc5;--warn:#92400e;--warn-bg:#fef3c7;--new:#b91c1c;--new-bg:#fee2e2;--chip:#eef1f4}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1216;--panel:#171b21;--text:#e6e9ed;--muted:#97a0aa;--line:#2a3038;--accent:#60a5fa;--ok:#22c55e;--off:#4b535d;--warn:#fbbf24;--warn-bg:#3a2d0b;--new:#fca5a5;--new-bg:#4a1717;--chip:#222831}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between;margin-bottom:16px}
+h1{font-size:22px;margin:0}
+.sub{color:var(--muted);font-size:13px}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:8px;padding:6px 12px}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.danger{color:var(--new);border-color:var(--new)}
+button:disabled{opacity:.6;cursor:default}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;text-align:left}
+.tile b{display:block;font-size:26px;font-variant-numeric:tabular-nums}
+.tile span{color:var(--muted);font-size:12px}
+.tile.alert b{color:var(--new)}
+@media(max-width:640px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.chip{background:var(--chip);border:1px solid transparent;border-radius:999px;padding:4px 12px}
+.chip.on{border-color:var(--accent);color:var(--accent)}
+input[type=search],input[type=text],textarea{font:inherit;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+input[type=search]{flex:1;min-width:160px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600;cursor:pointer;user-select:none;white-space:nowrap}
+th.sorted{color:var(--accent)}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--chip)}
+tbody tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;background:var(--off);margin-top:5px}
+.dot.on{background:var(--ok)}
+.name{font-weight:600}
+.meta{color:var(--muted);font-size:12px}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:1px;white-space:nowrap}
+.b-new{background:var(--new-bg);color:var(--new)}
+.b-unrev{background:var(--warn-bg);color:var(--warn)}
+.b-info{background:var(--chip);color:var(--muted)}
+.empty{padding:24px;text-align:center;color:var(--muted)}
+h2{font-size:16px;margin:28px 0 8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h2 label{font-size:13px;font-weight:400;color:var(--muted);display:flex;gap:6px;align-items:center}
+.events{list-style:none;margin:0;padding:0}
+.events li{padding:8px 12px;border-bottom:1px solid var(--line);display:flex;gap:12px}
+.events li:last-child{border-bottom:0}
+.events time{color:var(--muted);min-width:96px;font-size:12px;padding-top:1px;flex-shrink:0}
+.err{background:var(--warn-bg);color:var(--warn);padding:8px 12px;border-radius:8px;margin-bottom:12px}
+.tip{color:var(--muted);font-size:12px;margin-top:16px}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);width:min(440px,calc(100vw - 32px));padding:18px}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog label.f{display:block;margin:12px 0 4px;font-size:12px;color:var(--muted)}
+dialog input[type=text],dialog textarea{width:100%}
+dialog dl{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:10px 0 0;font-size:12.5px}
+dialog dt{color:var(--muted)}dialog dd{margin:0;word-break:break-all}
+.check{display:flex;gap:8px;align-items:center;margin-top:14px}
+.btns{display:flex;gap:8px;justify-content:space-between;margin-top:18px}
+@media(max-width:720px){
+ thead{display:none}
+ table,tbody,tr,td{display:block;width:100%}
+ tbody tr{padding:8px 2px;position:relative;border-bottom:1px solid var(--line)}
+ td{border:0!important;padding:2px 12px}
+ td.st{position:absolute;right:4px;top:10px;width:auto}
+ td.act{display:none}
+ td[data-l]::before{content:attr(data-l) "  ";color:var(--muted);font-family:system-ui,sans-serif;font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>Network Map</h1><div class="sub" id="scaninfo">Loading…</div></div>
+    <div><button id="csv">Export CSV</button> <button class="primary" id="scan">Scan now</button></div>
+  </header>
+  <div class="err" id="err" hidden></div>
+
+  <div class="tiles">
+    <button class="tile" data-f="online"><b id="t-online">–</b><span>Online now</span></button>
+    <button class="tile" data-f="all"><b id="t-all">–</b><span>Devices known</span></button>
+    <button class="tile" data-f="new" id="tile-new"><b id="t-new">–</b><span>New, not reviewed</span></button>
+    <button class="tile" data-f="unrev"><b id="t-unrev">–</b><span>Not yet reviewed</span></button>
+  </div>
+
+  <div class="toolbar" id="chips">
+    <button class="chip on" data-f="all">All</button>
+    <button class="chip" data-f="online">Online</button>
+    <button class="chip" data-f="offline">Offline</button>
+    <button class="chip" data-f="new">New</button>
+    <button class="chip" data-f="unrev">Not reviewed</button>
+    <input type="search" id="q" placeholder="Search name, IP, MAC, maker…" aria-label="Search devices">
+  </div>
+
+  <div class="panel">
+    <table>
+      <thead><tr>
+        <th data-k="online" title="Online">●</th><th data-k="name">Device</th><th data-k="ip">IP address</th>
+        <th data-k="mac">MAC address</th><th data-k="first">First seen</th><th data-k="last">Last seen</th>
+        <th data-k="queries">DNS lookups</th><th></th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" hidden>No devices match.</div>
+  </div>
+
+  <h2>Recent activity <label><input type="checkbox" id="showall"> include online/offline</label></h2>
+  <div class="panel"><ul class="events" id="events"></ul></div>
+
+  <p class="tip">Click a device to name it and mark it as reviewed. "Private" MAC addresses (most phones and some laptops)
+  are random per network, so the maker can't be looked up — Pi-hole's name and DNS lookups are the best clues.</p>
+</div>
+
+<dialog id="dlg">
+  <form id="form">
+    <div class="name" id="d-title"></div>
+    <dl id="d-info"></dl>
+    <label class="f" for="d-nick">Name</label>
+    <input type="text" id="d-nick" maxlength="64" placeholder="e.g. Living room TV">
+    <label class="f" for="d-notes">Notes</label>
+    <textarea id="d-notes" rows="3" maxlength="500"></textarea>
+    <div class="check"><input type="checkbox" id="d-trust"><label for="d-trust">I know this device (reviewed)</label></div>
+    <div class="btns">
+      <button type="button" class="danger" id="d-forget">Forget</button>
+      <span><button type="button" id="d-cancel">Cancel</button> <button type="submit" class="primary">Save</button></span>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+let devices = [], events = [], scan = {}, skew = 0;
+let filter = 'all', sortKey = null, sortDir = 1, editing = null;
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nowS = () => Date.now() / 1000 + skew;
+function ago(t) {
+  if (!t) return '—';
+  const s = Math.max(0, nowS() - t);
+  if (s < 90) return 'just now';
+  if (s < 3600) return Math.round(s / 60) + ' min ago';
+  if (s < 86400) return Math.round(s / 3600) + ' h ago';
+  if (s < 86400 * 30) return Math.round(s / 86400) + ' d ago';
+  return new Date(t * 1000).toLocaleDateString();
+}
+const when = t => t ? new Date(t * 1000).toLocaleString() : '—';
+const ipNum = ip => (ip || '').split('.').reduce((a, b) => a * 256 + (+b || 0), 0);
+const isNew = d => d.is_new && !d.trusted;
+const label = d => d.nickname || d.hostname || (d.vendor ? d.vendor.replace(/[,.]?\s*(inc|ltd|llc|co|corp|corporation|limited)\.?$/i, '') + ' device' : 'Unknown device');
+
+const SORTS = {
+  online: d => d.online, name: d => label(d).toLowerCase(), ip: d => ipNum(d.ip), mac: d => d.mac,
+  first: d => d.first_seen || 0, last: d => d.online ? Infinity : (d.last_seen || 0), queries: d => d.queries || 0,
+};
+const defaultSort = (a, b) => (b.online - a.online) || (isNew(b) - isNew(a)) || (ipNum(a.ip) - ipNum(b.ip));
+
+function render() {
+  $('#t-online').textContent = devices.filter(d => d.online).length;
+  $('#t-all').textContent = devices.length;
+  const nNew = devices.filter(isNew).length;
+  $('#t-new').textContent = nNew;
+  $('#tile-new').classList.toggle('alert', nNew > 0);
+  $('#t-unrev').textContent = devices.filter(d => !d.trusted).length;
+
+  const q = $('#q').value.trim().toLowerCase();
+  let list = devices.filter(d => filter === 'all' || (filter === 'online' && d.online) || (filter === 'offline' && !d.online)
+    || (filter === 'new' && isNew(d)) || (filter === 'unrev' && !d.trusted));
+  if (q) list = list.filter(d => [label(d), d.hostname, d.vendor, d.ip, d.mac, d.notes].join(' ').toLowerCase().includes(q));
+  if (sortKey) {
+    const f = SORTS[sortKey];
+    list.sort((a, b) => { const x = f(a), y = f(b); return (x < y ? -1 : x > y ? 1 : 0) * sortDir || defaultSort(a, b); });
+  } else list.sort(defaultSort);
+  document.querySelectorAll('th[data-k]').forEach(th => th.classList.toggle('sorted', th.dataset.k === sortKey));
+
+  $('#rows').innerHTML = list.map(d => {
+    const name = label(d);
+    const sub = [d.hostname && d.hostname !== name ? d.hostname : '', d.vendor].filter(Boolean).join(' · ');
+    let badges = '';
+    if (d.is_self) badges += '<span class="badge b-info">This Pi</span>';
+    if (isNew(d)) badges += '<span class="badge b-new">NEW</span>';
+    else if (!d.trusted) badges += '<span class="badge b-unrev">Not reviewed</span>';
+    return `<tr data-mac="${esc(d.mac)}">
+      <td class="st"><span class="dot ${d.online ? 'on' : ''}" title="${d.online ? 'Online' : 'Offline'}"></span></td>
+      <td><span class="name">${esc(name)}</span>${badges}${sub ? `<div class="meta">${esc(sub)}</div>` : ''}${d.notes ? `<div class="meta">${esc(d.notes)}</div>` : ''}</td>
+      <td class="mono" data-l="IP">${esc(d.ip || '—')}</td>
+      <td class="mono" data-l="MAC">${esc(d.mac)}${d.private_mac ? '<span class="badge b-info">Private</span>' : ''}</td>
+      <td data-l="First seen" title="${esc(when(d.first_seen))}">${ago(d.first_seen)}</td>
+      <td data-l="Last seen" title="${esc(when(d.last_seen))}">${d.online ? 'now' : ago(d.last_seen)}</td>
+      <td class="num" data-l="DNS lookups">${d.queries ? d.queries.toLocaleString() : '—'}</td>
+      <td class="act"><button>Edit</button></td></tr>`;
+  }).join('');
+  $('#empty').hidden = list.length > 0;
+}
+
+function renderEvents() {
+  const all = $('#showall').checked;
+  const list = events.filter(e => all || !['online', 'offline'].includes(e.kind)).slice(0, 100);
+  const text = e => {
+    const n = `<b>${esc(e.nickname || e.hostname || (e.vendor ? e.vendor + ' device' : e.mac || 'A device'))}</b>`;
+    switch (e.kind) {
+      case 'new': return `${n} joined the network for the first time <span class="meta">${esc(e.detail)}</span>`;
+      case 'online': return `${n} came online <span class="meta">${esc(e.detail)}</span>`;
+      case 'offline': return `${n} went offline`;
+      case 'ip': return `${n} changed IP address <span class="meta">${esc(e.detail)}</span>`;
+      default: return esc(e.detail);
+    }
+  };
+  $('#events').innerHTML = list.length
+    ? list.map(e => `<li><time title="${esc(when(e.ts))}">${ago(e.ts)}</time><span>${text(e)}</span></li>`).join('')
+    : '<li class="empty" style="display:block">No activity yet.</li>';
+}
+
+function renderScan() {
+  const every = scan.interval >= 120 ? Math.round(scan.interval / 60) + ' min' : scan.interval + ' s';
+  $('#scaninfo').textContent = (scan.busy ? 'Scanning…' : 'Last scan ' + ago(scan.last_scan)) + ' · scans every ' + every
+    + (scan.demo ? ' · DEMO DATA' : '');
+  $('#scan').disabled = !!scan.busy;
+  const err = $('#err');
+  err.hidden = !scan.error;
+  err.textContent = scan.error ? 'Last scan had a problem: ' + scan.error : '';
+}
+
+async function load() {
+  try {
+    const [a, b] = await Promise.all([fetch('api/devices').then(r => r.json()), fetch('api/events?limit=300').then(r => r.json())]);
+    devices = a.devices; scan = a.scan; skew = a.now - Date.now() / 1000; events = b.events;
+    render(); renderEvents(); renderScan();
+  } catch (e) {
+    const err = $('#err'); err.hidden = false; err.textContent = "Can't reach the Network Map service on the Pi.";
+  }
+}
+
+const post = (url, body) => fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)})
+  .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+
+function setFilter(f) {
+  filter = f;
+  document.querySelectorAll('#chips .chip').forEach(c => c.classList.toggle('on', c.dataset.f === f));
+  render();
+}
+
+function openEdit(mac) {
+  const d = devices.find(x => x.mac === mac);
+  if (!d) return;
+  editing = d;
+  $('#d-title').textContent = label(d);
+  const rows = [['Status', d.online ? 'Online' : 'Offline, last seen ' + when(d.last_seen)], ['IP', d.ip || '—'],
+    ['MAC', d.mac + (d.private_mac ? ' (private/random)' : '')], ['Maker', d.vendor || 'unknown'],
+    ['Hostname', d.hostname || '—'], ['First seen', when(d.first_seen)], ['DNS lookups', (d.queries || 0).toLocaleString()]];
+  $('#d-info').innerHTML = rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+  $('#d-nick').value = d.nickname || '';
+  $('#d-notes').value = d.notes || '';
+  $('#d-trust').checked = !!d.trusted;
+  $('#dlg').showModal();
+}
+
+$('#form').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  try {
+    await post('api/device', {mac: editing.mac, nickname: $('#d-nick').value, notes: $('#d-notes').value, trusted: $('#d-trust').checked});
+    $('#dlg').close(); load();
+  } catch (e) { alert('Could not save: ' + e.message); }
+});
+$('#d-cancel').onclick = () => $('#dlg').close();
+$('#d-forget').onclick = async () => {
+  if (!confirm('Forget this device? If it is still on the network it will come back as NEW on the next scan.')) return;
+  try { await post('api/forget', {mac: editing.mac}); $('#dlg').close(); load(); }
+  catch (e) { alert('Could not forget: ' + e.message); }
+};
+
+$('#rows').addEventListener('click', ev => { const tr = ev.target.closest('tr[data-mac]'); if (tr) openEdit(tr.dataset.mac); });
+document.querySelectorAll('[data-f]').forEach(el => el.addEventListener('click', () => setFilter(el.dataset.f)));
+document.querySelectorAll('th[data-k]').forEach(th => th.addEventListener('click', () => {
+  const k = th.dataset.k;
+  if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = ['first', 'last', 'queries', 'online'].includes(k) ? -1 : 1; }
+  render();
+}));
+$('#q').addEventListener('input', render);
+$('#showall').addEventListener('change', renderEvents);
+$('#csv').onclick = () => { location.href = 'devices.csv'; };
+$('#scan').onclick = async () => {
+  const before = scan.last_scan;
+  $('#scan').disabled = true; $('#scaninfo').textContent = 'Scanning…';
+  try { await post('api/scan', {}); } catch (e) {}
+  for (let i = 0; i < 45; i++) {
+    await new Promise(r => setTimeout(r, 2000));
+    await load();
+    if (!scan.busy && scan.last_scan !== before) break;
+  }
+};
+
+load();
+setInterval(load, 20000);
+</script>
+</body>
+</html>

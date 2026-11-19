@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio Checkup: free, private portfolio risk review</title>
+<meta name="description" content="Upload your brokerage and bank exports and get a plain-English risk review. Your files are analysed in your browser and never uploaded.">
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap bar"><a class="brand" href="./"><img src="icon.svg" alt=""> Portfolio Checkup</a>
+    <span class="privacy-pill" title="Files are read by your own browser. This site has no upload feature.">&#128274; Your files never leave your device</span></div>
+</header>
+
+<main class="wrap">
+  <section id="start">
+    <div class="hero">
+      <h1>See how risky your portfolio really is, in plain English</h1>
+      <p>Drop in the spreadsheets your bank or broker gives you: holdings, trade history, bank or credit-card statements. You'll get a risk check, "what if 2008 happened again", fees, cash runway and suggestions, all compared with today's economy.</p>
+      <ul class="ticks"><li>Works with Schwab, Fidelity, Vanguard, E*TRADE, Merrill, JPMorgan, Robinhood, Webull and most banks (Excel or CSV)</li>
+        <li><b>Private:</b> everything is calculated inside your browser. Nothing is uploaded or stored.</li>
+        <li>Free. No account needed.</li></ul>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2><span class="num">1</span> Add your files</h2>
+        <label id="drop" class="drop" for="file-in"><input id="file-in" type="file" multiple accept=".csv,.xlsx,.xls,.txt">
+          <b>Drop files here</b> or click to choose<br><small>Excel (.xlsx/.xls) or CSV, as many as you like</small></label>
+        <p class="muted small">Where to find them: in your broker's website look for <i>Positions &rarr; Export / Download</i> and <i>History / Activity &rarr; Download</i>; in your bank, <i>Download transactions (CSV)</i>.
+          Account numbers aren't needed, so you can delete those columns first.</p>
+        <button id="sample" class="link">No files handy? Try it with sample files &rarr;</button>
+        <div id="files"></div>
+      </div>
+      <div class="card">
+        <h2><span class="num">2</span> About you <small>(optional, makes suggestions fit you)</small></h2>
+        <div class="row3">
+          <label>Your age<input id="p-age" type="number" min="16" max="100" placeholder="e.g. 40"></label>
+          <label>Need this money in<select id="p-hor"><option value="">--</option><option value="2">under 3 years</option><option value="5">3-7 years</option><option value="10">7-15 years</option><option value="20">15+ years</option></select></label>
+          <label>Monthly spending<input id="p-spend" type="number" min="0" step="100" placeholder="$ (optional)"></label>
+        </div>
+        <label class="block">If your investments fell 25% in a year, you would...</label>
+        <div class="comfort" id="p-comfort">
+          <button data-v="1">Sell to stop the losses</button><button data-v="2">Feel very uneasy</button><button data-v="3" class="on">Wait it out</button>
+          <button data-v="4">Stay calm</button><button data-v="5">Buy more</button></div>
+        <label class="check"><input type="checkbox" id="p-remember"> Remember these answers in this browser (files are never saved)</label>
+      </div>
+    </div>
+    <div class="go-row"><button id="go" class="primary big" disabled>Check my portfolio</button><span id="go-note" class="muted"></span></div>
+  </section>
+
+  <section id="report" class="hidden"></section>
+
+  <footer class="foot">
+    <p><b>Educational information, not investment, tax or legal advice.</b> Portfolio Checkup is not a registered investment adviser or broker-dealer and doesn't know your full situation.
+      Results use simplified long-run assumptions and historical periods that may not repeat. Talk to a qualified, fiduciary adviser before making decisions.</p>
+    <p>Economic data: <a href="https://fred.stlouisfed.org/" target="_blank" rel="noopener">FRED, Federal Reserve Bank of St. Louis</a>. Spreadsheet reading: SheetJS. Your files are processed locally in your browser; this site has no upload endpoint.</p>
+  </footer>
+</main>
+<script src="lib/xlsx.full.min.js"></script>
+<script src="data.js"></script>
+<script src="parse.js"></script>
+<script src="analyze.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

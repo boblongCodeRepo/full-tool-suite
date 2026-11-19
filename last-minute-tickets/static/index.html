@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Last-Minute Tickets</title>
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand"><img src="icon.png" alt=""><div><b>Last-Minute Tickets</b><small id="sub">Games, concerts, shows and comedy near you, with the cheapest seats and price drops</small></div></div>
+  <div class="spacer"></div>
+  <div class="usage" id="status"></div>
+  <button class="primary" id="check">Check now</button>
+  <button class="ghost" id="open-settings">&#9881; Settings</button>
+</header>
+<main class="wrap">
+  <section id="setup" class="hidden"></section>
+  <section id="alerts" class="hidden"></section>
+  <div class="toolbar" id="toolbar"></div>
+  <section id="deals"></section>
+  <section id="list"><div class="loading">Loading...</div></section>
+  <div class="foot">Prices: SeatGeek's cheapest listing (fees included), Ticketmaster's face-value range when it publishes one.
+    Gametime has no public data feed, so its button opens Gametime's own search for that event.
+    Prices change by the minute; check the site before buying.</div>
+</main>
+<div id="modal" class="hidden"><div class="shade"></div><div class="dlg"></div></div>
+<div id="toast" class="hidden"></div>
+<script src="app.js"></script>
+</body>
+</html>

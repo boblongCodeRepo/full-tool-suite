@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Class Finder</title>
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="brand"><img src="icon.png" alt=""><div><b>Business Class Finder</b><small>Washington DC &middot; New York &middot; Chicago &rarr; Europe &amp; Asia</small></div></div>
+  <div class="trip" id="trip"></div>
+  <div class="spacer"></div>
+  <div class="credits" id="credits"></div>
+  <button class="ghost" id="open-settings">&#9881; Settings</button>
+  <button class="primary" id="check-all">Check all prices</button>
+</header>
+<div id="progress" class="hidden"><div class="bar"><i></i></div><span></span></div>
+<main>
+  <section id="setup" class="hidden"></section>
+  <section id="best"></section>
+  <section id="board"></section>
+  <section id="deals"></section>
+  <p class="foot">Prices are round trip in business class for 1 adult, in US dollars, from Google Flights via SerpApi. They change constantly; always confirm on the airline or Google Flights before booking.</p>
+</main>
+<div id="drawer" class="hidden"><div class="shade"></div><aside></aside></div>
+<div id="settings" class="hidden"><div class="shade"></div><div class="dlg"></div></div>
+<div id="toast" class="hidden"></div>
+<script src="app.js"></script>
+</body>
+</html>

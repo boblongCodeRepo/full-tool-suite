@@ -1,0 +1,16 @@
+services:
+  transit-pulse:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      WMATA_API_KEY: ""
+      TOMTOM_API_KEY: ""
+      DEFAULT_LAT: "38.90096"
+      DEFAULT_LON: "-77.05028"
+      DEFAULT_LABEL: "Foggy Bottom-GWU Metro"
+      TRAIN_LINE: "SV"
+      TRAIN_DESTINATION_CODES: "N10,N12"
+      TRAIN_DIRECTION_LABEL: "Silver Line toward Dulles/Ashburn"
+      STATION_CODES: "C04,A03"
+    restart: unless-stopped
